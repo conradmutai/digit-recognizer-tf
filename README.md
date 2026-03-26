@@ -1,51 +1,66 @@
-# Digit Recognizer - Kaggle Competition (Validation Accuracy of 99.52%)
+# Digit Recognizer - Deep Learning CNN
+
+![Validation Accuracy](https://img.shields.io/badge/Validation%20Accuracy-99.52%25-brightgreen)
+![Leaderboard](https://img.shields.io/badge/Kaggle-Top%2010%25-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
+
 ## Introduction
-Kaggle has a set of beginner competition that challenge users to explore different deep learning networks, and this one specifically tackled the usage of Convolutional Neural Networks. After spending time reading and practicing through Understanding Deep Learning and took the time to use the skills learned and applied it into this space, in addition there was periods that required learning experiences to create a convolutional neural network with TensorFlow rather than the standard PyTorch that was learned with the textbook to widen my understanding of the different libraries.
+Kaggle hosts a set of beginner competitions that challenge users to explore different deep learning networks. This project specifically tackles the classic MNIST Digit Recognizer challenge using Convolutional Neural Networks (CNNs). 
 
-## Performance of the Model
-The model achieved a validation accuracy of **99.52%** which placed my model within approximately the **Top 10%** of competitors in the leaderboard, on the second attempt. There is still room for improvement in the model which will be noted and used later to learn and progress towards a complete model and hopefully a 99.6%+ model accuracy going forward, but as of February 25th, 2026 this is where the model stands.
+After studying *Understanding Deep Learning*, I applied the concepts learned into this practical space. Additionally, this project served as a learning experience to build a CNN from scratch utilizing **TensorFlow** and **Keras** (transitioning from standard PyTorch), broadening my understanding of different deep learning libraries.
 
-## Data Generation
-Data was provided by Kaggle for this competition which contained a test and training data set which was utilised to train our model, however, in order to prevent factors like model memorization (the process where the model memorizes patterns though a training set and fails ot generalize) the training data was split into a validation and training set. The validation set will be used to help the model learn to generalize well.
+## Performance
+On the second attempt, the model achieved a validation accuracy of **99.52%**, placing it within approximately the **Top 10%** of competitors on the Kaggle leaderboard (as of February 25th, 2026). 
 
-In addition to generate more training data than was available to help increase the model accuracy, `ImageDataGenerator` from `tensorflow.keras.preprocessing.image` was utilised, creating variations of images by doing transformation like a **rotation range** and **zoom range** of 10%, and **width** and **height shift ranges** of 0.1.
+While the performance is strong, there is still room for improvement. Future iterations will aim to push the accuracy beyond the 99.6% threshold.
 
-The reason this is so vital and helps with improving the model accuracy, is that it provides variation to the model challenging the model to recognize new patterns rather than memorizing the same one, which as stated before helps the model accuracy due to the fact that it prevents generalization, and this is quite a common thing that is done in the vision AI projects and more.
+<div align="center">
+  <img src="[INSERT LINK TO YOUR ACCURACY/LOSS GRAPH IMAGE HERE, e.g., images/training_graph.png]" alt="Training and Validation Accuracy/Loss" width="600"/>
+</div>
 
-## Optimizers and Annealers
-### Optimizers
-Optimizers are utilized to prevent the model instability, and allowing smoother learning for the model, allowing for thus better performance and prediction, in addition to eliminating the model bias, and most importantly allowing the model to bypass its initial local minima to continue reducing loss, and increasing accuracy of the model. 
+## Data Preparation & Augmentation
+The dataset provided by Kaggle contained testing and training sets. To prevent model memorization (overfitting) and ensure the model generalizes well to unseen data, the training data was split into a 90% training and 10% validation set. 
 
-This was successfully carried out by the `Adam` optimizer, a well known optimizer that allows for the mean and the variance to be regulated by two decay rates, a learning rate, and a small positive constant to prevent these from reaching 0. 
+Data preprocessing included:
+* **Normalization:** Pixel values were scaled down from 0-255 to 0.0-1.0 to ensure faster convergence.
+* **Reshaping:** Data was reshaped into `(-1, 28, 28, 1)` to represent standard grayscale images.
+* **Label Encoding:** Labels were converted to distinct buckets using One-Hot Encoding (`to_categorical`).
 
-This was implemented in our model allowing for better results in the validation and training accuracy which pre-optimizer, was unstable per each epoch, and was also was poor performance wise, having early stages of stagnation in the loss and accuracy, which was seen in some graphs, through the training and modification phase of this model.
+To artificially expand the training dataset and improve model robustness, I utilized `ImageDataGenerator` from `tensorflow.keras.preprocessing.image` to apply random transformations:
+* **Rotation Range:** 10 degrees
+* **Zoom Range:** 10%
+* **Width & Height Shifts:** 10% (0.1)
 
-### Annealers
-Annealers are important to pushing the models performance early as it calls for the model to change the learning rate based on several factors, such as the **patience** which is set to 5 and a **factor** of 0.5, while focusing on the *val_accuracy* as the main focus of the annealer, all while keeping a minimum learning rate of 0.00001 to prevent the model from learning at a rate which is too slow.
+## Model Architecture
+The network was built using the `Sequential` API and consists of three convolutional blocks followed by a fully connected network.
 
-#### Patience
-Patience is the method of measuring when the model should adjust the learning rate based on the change of either accuracy/loss of the validation/training set. With a value set to 5 like the model has, it means that the learning rate will only adjust after **5 epochs** has passed, it is better to choose a number like this as it prevents too many spikes on the learning rate, allowing the program to take more time learn at set rates and see its effectiveness before changing it.
+* **Convolutional Layers:** Three `Conv2D` layers utilizing 32, 64, and 128 filters respectively, with a `5x5` kernel size and `ReLU` activation.
+* **Batch Normalization:** Applied after each convolutional layer to stabilize and accelerate the training process.
+* **Max Pooling:** `MaxPooling2D` with a 2x2 pool size was used to downsample feature maps and reduce computational load.
+* **Dropout Regularization:** Rates of 0.25 and 0.50 were strategically placed after the convolutional blocks and the dense layer to heavily combat overfitting by forcing the network to learn robust features.
+* **Classification Head:** A `Flatten` layer feeding into a 128-neuron `Dense` layer, ending with a 10-neuron `Softmax` output for digit classification (0-9).
 
-#### Factor
-Factor is a value that mulitplies the learning rate in order to reduce it whenever we have reached the end of the patience period (5 epochs in this case), choosing 0.5 provides a sort of middle ground that allows the learning rate to gradually change without causing stagnation in the learning through a factor which is too large (~0.9) and preventing exploding gradients through a factor which is too small (~0.01). 
+## Training Strategy: Optimizers and Annealers
+### Optimizer
+To prevent model instability and allow for smoother learning, the **Adam** optimizer was utilized. Adam regulates the mean and variance via decay rates, effectively eliminating model bias and allowing the model to bypass local minima to continue reducing categorical cross-entropy loss.
 
-## About Model
-The model was trained on a data set provided by the Kaggle competition with a network consisting of three `Conv2D` (2-dimensional convolution) layers followed by `ReLU` activation, with filters of 32, 64, 128 and kernel sizes of 5x5 as a final result of tweaking the layers, allowing me to achieve high validation accuracy. 
-
-It also implemented methods such as:
-* **Batch Normalization:** Applied after each convolutional layer to stabilize and accelerate the training process by maintaining the mean and variance of the layer's inputs.
-* **Max Pooling (`MaxPooling2D`):** Utilized with a 2x2 pool size to downsample the feature maps, reducing the spatial dimensions and the computational load while keeping the most important features.
-* **Dropout Regularization:** Rates of 0.25 and 0.50 were strategically placed after the convolutional blocks and the fully connected layer. This heavily combats overfitting by randomly disabling a fraction of neurons during training, forcing the network to learn robust features. 
-* **Fully Connected Layers:** The extracted 2D features are flattened into a 1D vector and passed through a `Dense` layer of 128 neurons. Finally, it reaches a `Softmax` output layer of 10 units, which outputs the probability distribution for our 10 digit classes (0-9).
+### Learning Rate Annealing
+Pushing the model's performance requires adjusting the learning rate dynamically. I implemented `ReduceLROnPlateau` to monitor the `val_accuracy`:
+* **Patience (5):** The learning rate only adjusts if no improvement is seen after 5 epochs, preventing erratic learning rate spikes.
+* **Factor (0.5):** Reduces the learning rate by half, providing a middle ground that prevents learning stagnation while avoiding exploding gradients.
+* **Minimum LR:** Capped at `0.00001` to ensure the model doesn't learn at a paralyzingly slow rate.
 
 ## Error Analysis
-To better understand where the model struggles, a Confusion Matrix was plotted using the validation set. By isolating the incorrect predictions, I was able to visualize the specific digits the model confused (for example, occasionally mistaking a poorly drawn '4' for a '9'). This manual error analysis is a great stepping stone for future improvements, such as tuning the image augmentation parameters to target these specific edge cases.
+To better understand where the model struggles, a Confusion Matrix was plotted using the validation set. 
 
-## Dependencies
-To run this notebook, the following libraries are required:
-* `tensorflow` / `keras`
-* `numpy`
-* `pandas`
-* `matplotlib`
-* `seaborn`
-* `scikit-learn`
+<div align="center">
+  <img src="[INSERT LINK TO YOUR CONFUSION MATRIX IMAGE HERE, e.g., images/confusion_matrix.png]" alt="Confusion Matrix" width="600"/>
+</div>
+
+By isolating incorrect predictions, it is easier to visualize the specific digits the model confused (e.g., occasionally mistaking a poorly drawn '4' for a '9'). This manual error analysis serves as a stepping stone for future improvements, such as tuning the image augmentation parameters to target these specific edge cases.
+
+## Dependencies & Setup
+To run the `Digit Recognizer.ipynb` notebook locally, ensure you have the following libraries installed:
+
+```bash
+pip install tensorflow numpy pandas matplotlib seaborn scikit-learn

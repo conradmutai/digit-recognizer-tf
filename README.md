@@ -30,6 +30,22 @@ Patience is the method of measuring when the model should adjust the learning ra
 Factor is a value that mulitplies the learning rate in order to reduce it whenever we have reached the end of the patience period (5 epochs in this case), choosing 0.5 provides a sort of middle ground that allows the learning rate to gradually change without causing stagnation in the learning through a factor which is too large (~0.9) and preventing exploding gradients through a factor which is too small (~0.01). 
 
 ## About Model
-The model was trained on a data set provided by the Kaggle competition with a network consisting of three `Conv2D` (2-dimensional convolution) layers followed by `ReLU` activation, with filters of 32, 64, 128 and kernel sizes of 3x3 as a final result of tweaking the layers, allowing be to achieve high validation accuracy. 
+The model was trained on a data set provided by the Kaggle competition with a network consisting of three `Conv2D` (2-dimensional convolution) layers followed by `ReLU` activation, with filters of 32, 64, 128 and kernel sizes of 5x5 as a final result of tweaking the layers, allowing me to achieve high validation accuracy. 
 
-It also implemented methods such as 
+It also implemented methods such as:
+* **Batch Normalization:** Applied after each convolutional layer to stabilize and accelerate the training process by maintaining the mean and variance of the layer's inputs.
+* **Max Pooling (`MaxPooling2D`):** Utilized with a 2x2 pool size to downsample the feature maps, reducing the spatial dimensions and the computational load while keeping the most important features.
+* **Dropout Regularization:** Rates of 0.25 and 0.50 were strategically placed after the convolutional blocks and the fully connected layer. This heavily combats overfitting by randomly disabling a fraction of neurons during training, forcing the network to learn robust features. 
+* **Fully Connected Layers:** The extracted 2D features are flattened into a 1D vector and passed through a `Dense` layer of 128 neurons. Finally, it reaches a `Softmax` output layer of 10 units, which outputs the probability distribution for our 10 digit classes (0-9).
+
+## Error Analysis
+To better understand where the model struggles, a Confusion Matrix was plotted using the validation set. By isolating the incorrect predictions, I was able to visualize the specific digits the model confused (for example, occasionally mistaking a poorly drawn '4' for a '9'). This manual error analysis is a great stepping stone for future improvements, such as tuning the image augmentation parameters to target these specific edge cases.
+
+## Dependencies
+To run this notebook, the following libraries are required:
+* `tensorflow` / `keras`
+* `numpy`
+* `pandas`
+* `matplotlib`
+* `seaborn`
+* `scikit-learn`

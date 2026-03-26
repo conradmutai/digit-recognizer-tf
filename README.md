@@ -15,7 +15,7 @@ On the second attempt, the model achieved a validation accuracy of **99.52%**, p
 While the performance is strong, there is still room for improvement. Future iterations will aim to push the accuracy beyond the 99.6% threshold.
 
 <div align="center">
-  <img src="[INSERT LINK TO YOUR ACCURACY/LOSS GRAPH IMAGE HERE, e.g., images/training_graph.png]" alt="Training and Validation Accuracy/Loss" width="600"/>
+  <img src="TrainingandValidationLossandAccuracy.png" alt="Training and Validation Accuracy/Loss" width="600"/>
 </div>
 
 ## Data Preparation & Augmentation
@@ -54,7 +54,7 @@ Pushing the model's performance requires adjusting the learning rate dynamically
 To better understand where the model struggles, a Confusion Matrix was plotted using the validation set. 
 
 <div align="center">
-  <img src="[INSERT LINK TO YOUR CONFUSION MATRIX IMAGE HERE, e.g., images/confusion_matrix.png]" alt="Confusion Matrix" width="600"/>
+  <img src="confusionmatrix.png" alt="Confusion Matrix" width="600"/>
 </div>
 
 By isolating incorrect predictions, it is easier to visualize the specific digits the model confused (e.g., occasionally mistaking a poorly drawn '4' for a '9'). This manual error analysis serves as a stepping stone for future improvements, such as tuning the image augmentation parameters to target these specific edge cases.
